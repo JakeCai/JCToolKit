@@ -54,4 +54,8 @@ namespace JCToolKit
         task _onDestructed;
     };
 
+    uint64_t getCurrentMillisecond(bool isSystemTime = false);
+
+    uint64_t getCurrentMicrosecond(bool isSystemTime = false);
+
 }
