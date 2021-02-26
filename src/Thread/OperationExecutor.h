@@ -22,7 +22,7 @@ namespace JCToolKit
     class OperationCancelableImp;
 
     template <class T, class... ArgTypes>
-    class OperationCancelableImp : public OperationCancelable
+    class OperationCancelableImp<T(ArgTypes...)> : public OperationCancelable
     {
     public:
         typedef std::shared_ptr<OperationCancelableImp> Ptr;
@@ -142,7 +142,7 @@ namespace JCToolKit
             _maxSize = maxSize;
             _maxUsec = maxUsec;
         }
-        ~ThreadLoad();
+        ~ThreadLoad() {}
 
         void startSleep()
         {

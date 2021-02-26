@@ -52,20 +52,20 @@ namespace JCToolKit
         return true;
     }
 
-    uint64_t getCurrentMillisecond(bool system_time)
+    uint64_t getCurrentMillisecond(bool isSystemTime)
     {
         static bool flag = initMillisecondThread();
-        if (system_time)
+        if (isSystemTime)
         {
             return s_currentMillisecond_system.load(std::memory_order_acquire);
         }
         return s_currentMillisecond.load(std::memory_order_acquire);
     }
 
-    uint64_t getCurrentMicrosecond(bool system_time)
+    uint64_t getCurrentMicrosecond(bool isSystemTime)
     {
         static bool flag = initMillisecondThread();
-        if (system_time)
+        if (isSystemTime)
         {
             return s_currentMicrosecond_system.load(std::memory_order_acquire);
         }

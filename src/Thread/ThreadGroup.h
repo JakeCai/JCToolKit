@@ -32,7 +32,7 @@ namespace JCToolKit {
 
         template<typename FUNC>
         std::thread* createThread(FUNC &&threadFunction) {
-            auto newThread = std::shared_ptr<std::thread>(threadFunction);
+            auto newThread = std::make_shared<std::thread>(threadFunction);
             _threadID = newThread->get_id();
             _threadMap[_threadID] = newThread;
             return newThread.get();
