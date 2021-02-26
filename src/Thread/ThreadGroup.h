@@ -24,7 +24,7 @@ namespace JCToolKit {
         bool isThreadIn(std::thread* thread) {
             if (!thread)
             {
-                return;
+                return false;
             }
             auto result = _threadMap.find(thread->get_id());
             return result != _threadMap.end();

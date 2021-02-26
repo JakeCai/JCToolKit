@@ -5,8 +5,8 @@
 #include <vector>
 #include <thread>
 #include "Semaphore.h"
-#include "List.h"
-#include "Utilities.h"
+#include "Util/List.h"
+#include "Util/Utilities.h"
 
 namespace JCToolKit
 {
@@ -61,19 +61,19 @@ namespace JCToolKit
             return defaultValue<T>();
         }
 
-        template <typename T>
-        static typename std::enable_if<std::is_void<T>::value, void>::type
+        template <typename C>
+        static typename std::enable_if<std::is_void<C>::value, void>::type
         defaultValue() {}
 
-        template <typename T>
-        static typename std::enable_if<std::is_pointer<T>::value, T>::type
+        template <typename C>
+        static typename std::enable_if<std::is_pointer<C>::value, C>::type
         defaultValue()
         {
             return nullptr;
         }
 
-        template <typename T>
-        static typename std::enable_if<std::is_integral<T>::value, T>::type
+        template <typename C>
+        static typename std::enable_if<std::is_integral<C>::value, C>::type
         defaultValue()
         {
             return 0;
