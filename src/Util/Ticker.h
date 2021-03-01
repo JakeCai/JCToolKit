@@ -8,19 +8,18 @@ namespace JCToolKit
     class Ticker
     {
     public:
-        Ticker(uint64_t maxTickTime = 0)
+        Ticker(uint64_t minTickTime = 0)
         {
             _created = _begin = getCurrentMillisecond();
-            _maxTickTime = maxTickTime;
+            _minTickTime = minTickTime;
         }
 
         ~Ticker()
         {
             uint64_t time = createdTime();
-            if (time > _maxTickTime)
+            if (time > _minTickTime)
             {
-                std::cout << "Tick time:" << time << "ms"
-                          << "(overloaded)" << std::endl;
+                std::cout << "Tick time:" << time << "ms" << std::endl;
             }
         }
 
@@ -41,7 +40,7 @@ namespace JCToolKit
         }
 
     private:
-        uint64_t _maxTickTime;
+        uint64_t _minTickTime;
         uint64_t _created;
         uint64_t _begin;
     };

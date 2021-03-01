@@ -16,11 +16,11 @@ namespace JCToolKit
     class ReusePool;
 
     template <typename T>
-    class share_ptr_imp : public std::shared_ptr<T>
+    class shared_ptr_imp : public std::shared_ptr<T>
     {
     public:
-        share_ptr_imp() {}
-        share_ptr_imp(T *ptr, const std::weak_ptr<ReusePool_l<T> > &weakPool, std::shared_ptr<std::atomic_bool> quit);
+        shared_ptr_imp() {}
+        shared_ptr_imp(T *ptr, const std::weak_ptr<ReusePool_l<T> > &weakPool, std::shared_ptr<std::atomic_bool> quit);
 
         void quit(bool flag = true)
         {
@@ -38,15 +38,15 @@ namespace JCToolKit
     class ReusePool_l : public std::enable_shared_from_this<ReusePool_l<T> >
     {
     public:
-        typedef share_ptr_imp<T> ValuePtr;
-        friend class share_ptr_imp<T>;
+        typedef shared_ptr_imp<T> ValuePtr;
+        friend class shared_ptr_imp<T>;
         friend class ReusePool<T>;
 
         ReusePool_l()
         {
             _alloctor = []() -> T * {
                 return new T();
-            }
+            };
         }
 
         template <typename... ArgTypes>
@@ -54,7 +54,7 @@ namespace JCToolKit
         {
             _alloctor = [args...]() -> T * {
                 return new T(args...);
-            }
+            };
         }
 
         ~ReusePool_l()
@@ -92,6 +92,12 @@ namespace JCToolKit
             }
             return ValuePtr(ptr, _weakSelf, std::make_shared<std::atomic_bool>(false));
         }
+    private:
+        size_t _poolSize = 8;
+        List<T *> _objs;
+        std::function<T *(void)> _alloctor;
+        std::atomic_flag _flag{false};
+        std::weak_ptr<ReusePool_l> _weakSelf;
 
     private:
         void recycle(T *obj)
@@ -99,7 +105,7 @@ namespace JCToolKit
             auto flag = _flag.test_and_set();
             if (!flag)
             {
-                if (_objs.size() >= _poolsize)
+                if (_objs.size() >= _poolSize)
                 {
                     delete obj;
                 }
@@ -119,20 +125,13 @@ namespace JCToolKit
         {
             _weakSelf = this->shared_from_this();
         }
-
-    private:
-        size_t _poolSize = 8;
-        List<T *> _objs;
-        std::function<T *(void)> _alloctor;
-        std::atomic_flag _flag{false};
-        std::weak_ptr<ReusePool_l> _weakSelf;
     };
 
     template <typename T>
     class ReusePool
     {
     public:
-        typedef share_ptr_imp<T> ValuePtr;
+        typedef shared_ptr_imp<T> ValuePtr;
         ReusePool()
         {
             _pool.reset(new ReusePool_l<T>());
@@ -161,18 +160,19 @@ namespace JCToolKit
     };
 
     template <typename T>
-    share_ptr_imp<T>::share_ptr_imp(T *ptr,
-                                    const std::weak_ptr<ReusePool_l<T> > &weakPool,
-                                    std::shared_ptr<std::atomic_bool> quit) : std::share_ptr(ptr, [weakPool, quit](T *) {
-                                                                                  auto strongPool = weakPool.lock();
-                                                                                  if (strongPool && !(*quit))
-                                                                                  {
-                                                                                      strongPool->recycle(ptr);
-                                                                                  }
-                                                                                  else
-                                                                                  {
-                                                                                      delete ptr;
-                                                                                  }
-                                                                              }),
-                                                                              _quit(std::move(quit)){ }
+    shared_ptr_imp<T>::shared_ptr_imp(T *ptr,
+                                      const std::weak_ptr<ReusePool_l<T> > &weakPool,
+                                      std::shared_ptr<std::atomic_bool> quit) : std::shared_ptr<T>(ptr, [weakPool, quit](T *ptr) {
+                                                                                    auto strongPool = weakPool.lock();
+                                                                                    if (strongPool && !(*quit))
+                                                                                    {
+                                                                                        //循环池还在并且不放弃放入循环池
+                                                                                        strongPool->recycle(ptr);
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        delete ptr;
+                                                                                    }
+                                                                                }),
+                                                                                _quit(std::move(quit)) {}
 }
