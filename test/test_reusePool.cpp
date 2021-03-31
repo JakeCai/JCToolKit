@@ -2,30 +2,11 @@
 #include <iostream>
 #include <random>
 #include "Util/ReusePool.h"
+#include "Util/Utilities.h"
 #include "Thread/ThreadGroup.h"
 #include <list>
-#include <sstream>
 
 using namespace JCToolKit;
-
-class StrPrinter : public std::string {
-public:
-    StrPrinter() {}
-
-    template<typename T>
-    StrPrinter& operator <<(T && data) {
-        _stream << std::forward<T>(data);
-        this->std::string::operator=(_stream.str());
-        return *this;
-    }
-
-    std::string operator <<(std::ostream&(*f)(std::ostream&)) const {
-        return *this;
-    }
-
-private:
-    std::stringstream _stream;
-};
 
 //程序退出标志
 bool g_bExitFlag = false;
