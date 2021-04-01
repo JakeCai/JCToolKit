@@ -334,7 +334,7 @@ namespace JCToolKit
             }
         }
 
-    private:
+    protected:
         size_t _pos = 0;
         std::vector<OperationExecutor::Ptr> _executors;
     };
